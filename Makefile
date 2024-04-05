@@ -1,4 +1,4 @@
-BINARY_NAME=quake-data-collector.out
+BINARY_NAME=go-ddd.out
  
 MAIN_FILE="internal/context/log_handler/main.go"
 
