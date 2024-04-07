@@ -1,4 +1,4 @@
-package service
+package common
 
 import (
 	"context"
@@ -9,6 +9,7 @@ import (
 	eventsH "github.com/ddd/internal/context/log_handler/domain/model/human_logfile/events"
 	"github.com/ddd/internal/context/log_handler/domain/model/logfile"
 	"github.com/ddd/internal/context/log_handler/domain/model/logfile/events"
+	"github.com/ddd/internal/context/log_handler/infra/service"
 	"go.uber.org/mock/gomock"
 
 	_ "github.com/go-sql-driver/mysql"
@@ -35,21 +36,22 @@ func TestShouldBeAbleToRunEndToEndCommandsSuccessfully(t *testing.T) {
 
 func runEndToEndCommands() {
 
-	pathFile := support.GetFilePath("/../../tmp/qgames.log")
+	pathFile := support.GetFilePath("internal/context/log_handler/infra/storage/qgames.log")
 
 	controll := gomock.NewController(ag.T)
 	defer controll.Finish()
 
-	var repo = NewMockLogFileRepository(controll)
+	var repo = service.NewMockLogFileRepository(controll)
 
 	file, _ := os.Open(pathFile)
 	logFileEntity := &logfile.LogFileEntity{
-		Path: pathFile,
+		Path: support.NewString(pathFile),
 		File: file,
 	}
 
 	repo.EXPECT().ReadFrom(gomock.Any()).Return(logFileEntity, nil).Times(1)
 	repo.EXPECT().Add(gomock.Any(), gomock.Any()).Return(nil).Times(1)
+	repo.EXPECT().GetAll(gomock.Any()).Return(nil, nil).Times(1)
 
 	ctx := context.Background()
 	db, mock, err := sqlmock.New()
@@ -60,11 +62,11 @@ func runEndToEndCommands() {
 	mock.ExpectBegin()
 	mock.ExpectCommit()
 
-	app := NewApplication(ctx, eventBus, repo, db)
+	app := service.NewApplication(ctx, eventBus, repo, db)
 	appM := serviceM.NewApplication(ctx)
 
-	resultLogFile := SelectLogFileCommandDispatcher(ctx, &app, pathFile)
-	resultHumanLogFile := CreateHumanLogFileCommandDispatcher(ctx, &app, resultLogFile)
+	resultLogFile := service.SelectLogFileCommandDispatcher(ctx, &app, support.NewString(pathFile))
+	resultHumanLogFile := service.CreateHumanLogFileCommandDispatcher(ctx, &app, resultLogFile)
 	rawData := integration.PreSendCommand(resultHumanLogFile)
 	serviceM.FindPlayersKilledCommandDispatcher(ctx, &appM, rawData)
 }

@@ -14,6 +14,7 @@ import (
 	reflect "reflect"
 
 	logfile "github.com/ddd/internal/context/log_handler/domain/model/logfile"
+	support "github.com/ddd/pkg/support"
 	gomock "go.uber.org/mock/gomock"
 )
 
@@ -54,8 +55,23 @@ func (mr *MockLogFileRepositoryMockRecorder) Add(entity, ctx any) *gomock.Call {
 	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "Add", reflect.TypeOf((*MockLogFileRepository)(nil).Add), entity, ctx)
 }
 
+// GetAll mocks base method.
+func (m *MockLogFileRepository) GetAll(ctx context.Context) (*[]logfile.LogFileEntity, error) {
+	m.ctrl.T.Helper()
+	ret := m.ctrl.Call(m, "GetAll", ctx)
+	ret0, _ := ret[0].(*[]logfile.LogFileEntity)
+	ret1, _ := ret[1].(error)
+	return ret0, ret1
+}
+
+// GetAll indicates an expected call of GetAll.
+func (mr *MockLogFileRepositoryMockRecorder) GetAll(ctx any) *gomock.Call {
+	mr.mock.ctrl.T.Helper()
+	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "GetAll", reflect.TypeOf((*MockLogFileRepository)(nil).GetAll), ctx)
+}
+
 // ReadFrom mocks base method.
-func (m *MockLogFileRepository) ReadFrom(path string) (*logfile.LogFileEntity, error) {
+func (m *MockLogFileRepository) ReadFrom(path support.String) (*logfile.LogFileEntity, error) {
 	m.ctrl.T.Helper()
 	ret := m.ctrl.Call(m, "ReadFrom", path)
 	ret0, _ := ret[0].(*logfile.LogFileEntity)

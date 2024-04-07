@@ -11,5 +11,5 @@ func GetFilePath(path string) string {
 		panic("Failed to get the current file's path")
 	}
 	dir := filepath.Dir(filename)
-	return dir + path
+	return dir + "/../../" + path
 }

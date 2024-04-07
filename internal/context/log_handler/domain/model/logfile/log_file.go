@@ -8,6 +8,7 @@ import (
 
 	"github.com/ddd/internal/context/log_handler/domain/model/logfile/events"
 	"github.com/ddd/pkg/building_blocks/domain"
+	"github.com/ddd/pkg/support"
 	"github.com/google/uuid"
 )
 
@@ -22,11 +23,11 @@ type LogFile interface {
 
 type LogFileEntity struct {
 	domain.AggregateRoot
-	Path string
+	Path support.String
 	File *os.File
 }
 
-func NewLogFile(id uuid.UUID, p string) LogFile {
+func NewLogFile(id uuid.UUID, p support.String) LogFile {
 	return &LogFileEntity{
 		AggregateRoot: domain.AggregateRoot{ID: id},
 		Path:          p,

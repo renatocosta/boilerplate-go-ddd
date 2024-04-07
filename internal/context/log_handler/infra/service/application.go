@@ -14,6 +14,7 @@ import (
 	"github.com/ddd/internal/context/log_handler/domain/model/logfile/events"
 	"github.com/ddd/pkg/building_blocks/domain"
 	"github.com/ddd/pkg/building_blocks/infra/bus"
+	"github.com/ddd/pkg/support"
 	"github.com/google/uuid"
 )
 
@@ -58,7 +59,7 @@ func NewApplication(ctx context.Context, eventBus *bus.EventBus, logFileRepo log
 	}
 }
 
-func SelectLogFileCommandDispatcher(ctx context.Context, app *app.Application, pathFile string) []string {
+func SelectLogFileCommandDispatcher(ctx context.Context, app *app.Application, pathFile support.String) []string {
 	selectLogFileCommand := command.SelectLogFileCommand{ID: uuid.New(), Path: pathFile}
 	resultLogFile, err := app.Commands.SelectLogFile.Handle(ctx, selectLogFileCommand)
 	if err != nil {

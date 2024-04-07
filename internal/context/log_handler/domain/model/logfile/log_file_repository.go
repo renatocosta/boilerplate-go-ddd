@@ -3,6 +3,8 @@ package logfile
 import (
 	"context"
 	"errors"
+
+	"github.com/ddd/pkg/support"
 )
 
 var (
@@ -12,5 +14,6 @@ var (
 
 type LogFileRepository interface {
 	Add(entity LogFile, ctx context.Context) error
-	ReadFrom(path string) (*LogFileEntity, error)
+	ReadFrom(path support.String) (*LogFileEntity, error)
+	GetAll(ctx context.Context) (*[]LogFileEntity, error)
 }

@@ -1,11 +1,14 @@
 package events
 
-import "github.com/google/uuid"
+import (
+	"github.com/ddd/pkg/support"
+	"github.com/google/uuid"
+)
 
 const LogFileSelectedEvent = "LogFileSelected"
 
 type LogFileSelected struct {
 	ID      uuid.UUID
 	Content []string
-	Path    string
+	Path    support.String
 }

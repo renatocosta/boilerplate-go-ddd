@@ -7,12 +7,13 @@ import (
 	"github.com/ddd/internal/context/log_handler/domain/model/logfile"
 	"github.com/ddd/pkg/building_blocks/app"
 	"github.com/ddd/pkg/building_blocks/infra/bus"
+	"github.com/ddd/pkg/support"
 	"github.com/google/uuid"
 )
 
 type SelectLogFileCommand struct {
 	ID   uuid.UUID
-	Path string
+	Path support.String
 }
 
 type SelectLogFileHandler app.CommandHandler[SelectLogFileCommand, []string]
@@ -44,6 +45,8 @@ func (h selectLogFileHandler) Handle(ctx context.Context, cmd SelectLogFileComma
 	if err != nil {
 		return []string{}, err
 	}
+
+	h.repo.GetAll(ctx)
 
 	logFile := logfile.NewLogFile(cmd.ID, logFileRepo.Path)
 
