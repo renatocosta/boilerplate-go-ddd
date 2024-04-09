@@ -1,0 +1,18 @@
+{
+    "version": "0.2.0",
+    "configurations": [
+      {
+        "name": "Launch",
+        "type": "go",
+        "request": "attach",
+        "mode": "remote",
+        "program": "${workspaceFolder}/cmd/log_handler",
+        "env": {},
+        "args": [],
+        "showLog": true,
+        "trace": "verbose",
+        "port": 2345
+    }
+    ]
+  }
+  

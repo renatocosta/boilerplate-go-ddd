@@ -37,5 +37,4 @@ func main() {
 	rawData := integration.PreSendCommand(resultHumanLogFile)
 
 	integration.Dispatch(ctx, rawData)
-
 }

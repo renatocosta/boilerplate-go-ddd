@@ -1,0 +1,9 @@
+version: "2"
+sql:
+  - engine: "mysql"
+    queries: "query.sql"
+    schema: "db/migrations/log_handler"
+    gen:
+      go:
+        package: "tutorial"
+        out: "tutorial"

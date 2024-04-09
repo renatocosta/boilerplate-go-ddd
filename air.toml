@@ -1,0 +1,14 @@
+# .air.toml
+# Air configuration file
+[build]
+binary = "cmd/log_handler/main"
+include = [
+  "**/*.go"
+]
+exclude = [
+  "vendor",
+  "**/*_test.go"
+]
+
+[runner]
+args = ["-gcflags=all=-N -l"]

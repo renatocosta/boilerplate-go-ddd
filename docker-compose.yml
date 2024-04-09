@@ -1,0 +1,28 @@
+version: '3.8'
+services:
+  app:
+    build: .
+    ports:
+      - "8080:8080"
+    volumes:
+      - .:/app
+    environment:
+      - AIR_ENV=development
+    depends_on:
+      - mysql
+    networks:
+      - mynet      
+  mysql:
+    image: mysql:5.7
+    restart: always
+    environment:
+      MYSQL_ROOT_PASSWORD: root
+      MYSQL_DATABASE: db
+      MYSQL_USER: renato
+      MYSQL_PASSWORD: secret
+    networks:
+      - mynet      
+    ports:
+      - "3306:3306"
+networks:
+  mynet:

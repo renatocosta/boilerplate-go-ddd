@@ -5,15 +5,25 @@ import (
 	"fmt"
 	"log"
 	"os"
+	"path/filepath"
+	"runtime"
 
 	"github.com/joho/godotenv"
 )
 
 func GetDb() (*sql.DB, error) {
 
-	err := godotenv.Load()
+	_, filename, _, ok := runtime.Caller(0)
+	if !ok {
+		panic("Failed to get the current file's path")
+	}
+
+	dir := filepath.Dir(filename)
+
+	err := godotenv.Load(dir + "/../../../../../.env")
+
 	if err != nil {
-		log.Fatal("Error loading .env file")
+		log.Fatal(err)
 	}
 
 	dataSourceName := fmt.Sprintf("%s:%s@tcp(%s:%s)/%s", os.Getenv("DB_USERNAME"), os.Getenv("DB_PASSWORD"), os.Getenv("DB_HOST"), os.Getenv("DB_PORT"), os.Getenv("DB_DATABASE"))
