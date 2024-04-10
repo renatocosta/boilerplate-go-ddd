@@ -4,7 +4,6 @@ include .env
 export $(shell sed 's/=.*//' .env)
 
 MAIN_FILE="cmd/log_handler/main.go"
-DATABASE_URL=mysql://root:secret@127.0.0.1:3306/db?sslmode=disable
 MIGRATIONS_LOG_HANDLER_PATH=./migrations/log_handler
 DATABASE_URL=mysql://$(DB_USERNAME):$(DB_PASSWORD)@tcp($(DB_HOST):$(DB_PORT))/$(DB_DATABASE)
 
