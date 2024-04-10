@@ -2,6 +2,9 @@ package main
 
 import (
 	"context"
+	"log"
+	"net/http"
+	_ "net/http/pprof"
 
 	_ "github.com/go-sql-driver/mysql"
 
@@ -16,6 +19,10 @@ import (
 var eventBus = bus.NewEventBus()
 
 func main() {
+
+	go func() {
+		log.Println(http.ListenAndServe("localhost:6060", nil))
+	}()
 
 	ctx := context.Background()
 
