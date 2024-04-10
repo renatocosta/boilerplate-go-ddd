@@ -12,6 +12,7 @@ import (
 	eventsH "github.com/ddd/internal/context/log_handler/domain/model/human_logfile/events"
 	"github.com/ddd/internal/context/log_handler/domain/model/logfile"
 	"github.com/ddd/internal/context/log_handler/domain/model/logfile/events"
+	"github.com/ddd/internal/context/log_handler/infra/dispatcher"
 	"github.com/ddd/pkg/building_blocks/domain"
 	"github.com/ddd/pkg/building_blocks/infra/bus"
 	"github.com/ddd/pkg/support"
@@ -28,25 +29,25 @@ func NewApplication(ctx context.Context, eventBus *bus.EventBus, logFileRepo log
 	subscriberHumanLogFileCreated := eventsH.HumanLogFileCreatedEvent
 	eventBus.Subscribe(subscriberHumanLogFileCreated, eventChan)
 
-	eventHandlers := []bus.EventHandlerList{
-		bus.EventHandlerList{
+	eventHandlers := []dispatcher.EventHandlerList{
+		dispatcher.EventHandlerList{
 			EventName: subscriberLogFileSelected,
-			Handlers: []bus.EventHandlerFunc{
+			Handlers: []dispatcher.EventHandlerFunc{
 				event_handler.SelectLogFileEventHandler,
 				event_handler.SelectLogFileEventHandler2,
 			},
 		},
-		bus.EventHandlerList{
+		dispatcher.EventHandlerList{
 			EventName: subscriberHumanLogFileCreated,
-			Handlers: []bus.EventHandlerFunc{
+			Handlers: []dispatcher.EventHandlerFunc{
 				event_handler.CreateHumanFileEventHandler,
 			},
 		},
 	}
 
-	additionalDependencies := bus.NewAdditionalDependencies(logFileRepo)
+	additionalDependencies := dispatcher.NewAdditionalDependencies(logFileRepo)
 
-	go bus.HandleEvent(ctx, eventChan, eventHandlers, additionalDependencies)
+	go dispatcher.HandleEvent(ctx, eventChan, eventHandlers, additionalDependencies)
 
 	return app.Application{
 		Commands: app.Commands{
