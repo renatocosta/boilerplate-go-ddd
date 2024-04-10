@@ -12,7 +12,10 @@ local.build:
 	@go build -ldflags "-s -w" -o ${BINARY_NAME} ${MAIN_FILE}
  
 local.test: .FORCE
-	@go test -v ./... -bench=.
+	@go test -v ./...
+
+local.bench: .FORCE
+	@go test -v ./... -bench=.	
 
 local.run:
 	@go build -ldflags "-s -w" -o ${BINARY_NAME} ${MAIN_FILE}

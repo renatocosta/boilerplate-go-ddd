@@ -5,6 +5,7 @@ Example of Clean Architecture + DDD in go
 ## Unit testing
 ```
 make local.test
+```
 
 ## Let's Run the Application 
 ```
