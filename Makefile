@@ -4,7 +4,7 @@ include .env
 export $(shell sed 's/=.*//' .env)
 
 MAIN_FILE="cmd/log_handler/main.go"
-MIGRATIONS_LOG_HANDLER_PATH=./migrations/log_handler
+MIGRATIONS_LOG_HANDLER_PATH=./db/migrations/log_handler
 DATABASE_URL=mysql://$(DB_USERNAME):$(DB_PASSWORD)@tcp($(DB_HOST):$(DB_PORT))/$(DB_DATABASE)
 
 local.build:
@@ -29,6 +29,9 @@ local.migrate-up:
 
 local.migrate-down:
 	migrate -path $(MIGRATIONS_LOG_HANDLER_PATH) -database "$(DATABASE_URL)" -verbose down
+
+local.debug: .FORCE
+	cd cmd/log_handler && dlv debug --headless --listen=:2345 --api-version=2
 
 docker-compose.run:
 	docker-compose exec app go run ${MAIN_FILE}

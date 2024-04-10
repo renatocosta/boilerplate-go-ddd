@@ -46,8 +46,6 @@ func (h selectLogFileHandler) Handle(ctx context.Context, cmd SelectLogFileComma
 		return []string{}, err
 	}
 
-	h.repo.GetAll(ctx)
-
 	logFile := logfile.NewLogFile(cmd.ID, logFileRepo.Path)
 
 	lines, err := logFile.ExtractFrom(logFileRepo.File)

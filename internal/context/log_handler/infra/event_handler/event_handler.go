@@ -1,8 +1,7 @@
-package dispatcher
+package event_handler
 
 import (
 	"context"
-	"fmt"
 
 	"github.com/ddd/internal/context/log_handler/domain/model/logfile"
 	"github.com/ddd/pkg/building_blocks/domain"
@@ -27,9 +26,6 @@ func HandleEvent(ctx context.Context, eventChan <-chan domain.Event, eventHandle
 
 	for {
 		select {
-		case <-ctx.Done():
-			fmt.Println("Event Handler channel cancelled")
-			return
 		case event := <-eventChan:
 			for _, handler := range eventHandlers {
 				if handler.EventName == event.Type {

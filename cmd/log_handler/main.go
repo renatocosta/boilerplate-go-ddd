@@ -4,13 +4,14 @@ import (
 	"context"
 	_ "net/http/pprof"
 
+	"github.com/gin-gonic/gin"
 	_ "github.com/go-sql-driver/mysql"
 
 	"github.com/ddd/pkg/building_blocks/infra/bus"
-	"github.com/ddd/pkg/integration"
 	"github.com/ddd/pkg/support"
 
 	"github.com/ddd/internal/context/log_handler/infra/adapters"
+	"github.com/ddd/internal/context/log_handler/infra/ports/http"
 	"github.com/ddd/internal/context/log_handler/infra/service"
 )
 
@@ -18,7 +19,12 @@ var eventBus = bus.NewEventBus()
 
 func main() {
 
-	ctx := context.Background()
+	errorApp := ""
+
+	ctx, cancel := context.WithCancel(context.Background())
+	defer func() {
+		support.ShutdownApp(ctx, cancel, errorApp)
+	}()
 
 	db, err := service.GetDb()
 	defer func() {
@@ -26,16 +32,19 @@ func main() {
 	}()
 
 	if err != nil {
-		panic(err.Error())
+		errorApp = err.Error()
+		cancel()
+		return
 	}
-	app := service.NewApplication(ctx, eventBus, adapters.NewLogFileRepository(db), db)
 
-	pathFile := support.GetFilePath("internal/context/log_handler/infra/storage/qgames.log")
-	resultLogFile := service.SelectLogFileCommandDispatcher(ctx, &app, support.NewString(pathFile))
+	app, _ := service.NewApplication(ctx, eventBus, adapters.NewLogFileRepository(db), db)
 
-	resultHumanLogFile := service.CreateHumanLogFileCommandDispatcher(ctx, &app, resultLogFile)
+	router := gin.Default()
+	h := http.HttpServer{App: app}
+	http.InitRoutes(&router.RouterGroup, h)
+	if err := router.Run(":8888"); err != nil {
+		errorApp = err.Error()
+		cancel()
+	}
 
-	rawData := integration.PreSendCommand(resultHumanLogFile)
-
-	integration.Dispatch(ctx, rawData)
 }
