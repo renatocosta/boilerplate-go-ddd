@@ -8,15 +8,12 @@ import (
 	"github.com/ddd/internal/context/log_handler/app/command"
 	"github.com/ddd/internal/context/log_handler/app/event_handler"
 	"github.com/ddd/internal/context/log_handler/app/query"
-	"github.com/ddd/internal/context/log_handler/domain/model/human_logfile"
 	eventsH "github.com/ddd/internal/context/log_handler/domain/model/human_logfile/events"
 	"github.com/ddd/internal/context/log_handler/domain/model/logfile"
 	"github.com/ddd/internal/context/log_handler/domain/model/logfile/events"
 	eventHandlerInfra "github.com/ddd/internal/context/log_handler/infra/event_handler"
 	"github.com/ddd/pkg/building_blocks/domain"
 	"github.com/ddd/pkg/building_blocks/infra/bus"
-	"github.com/ddd/pkg/support"
-	"github.com/google/uuid"
 )
 
 func NewApplication(ctx context.Context, eventBus *bus.EventBus, logFileRepo logfile.LogFileRepository, db *sql.DB) (app.Application, func()) {
@@ -62,24 +59,4 @@ func NewApplication(ctx context.Context, eventBus *bus.EventBus, logFileRepo log
 			//_ = closeDbConnection()
 			//_ = closeGrpcConnection()
 		}
-}
-
-//Command Handlers
-
-func SelectLogFileCommandDispatcher(ctx context.Context, app *app.Application, pathFile support.String) []string {
-	selectLogFileCommand := command.SelectLogFileCommand{ID: uuid.New(), Path: pathFile}
-	resultLogFile, err := app.Commands.SelectLogFile.Handle(ctx, selectLogFileCommand)
-	if err != nil {
-		panic(err.Error())
-	}
-	return resultLogFile
-}
-
-func CreateHumanLogFileCommandDispatcher(ctx context.Context, app *app.Application, resultLogFile []string) []human_logfile.HumanLogFileRowable {
-	createHumanLogFileCommand := command.CreateHumanLogFileCommand{ID: uuid.New(), Content: resultLogFile}
-	resultHumanLogFile, err := app.Commands.CreateHumanLogFile.Handle(ctx, createHumanLogFileCommand)
-	if err != nil {
-		panic(err.Error())
-	}
-	return resultHumanLogFile
 }

@@ -4,11 +4,12 @@ import (
 	"net/http"
 
 	"github.com/ddd/internal/context/log_handler/app"
+	"github.com/ddd/internal/context/log_handler/app/command"
 	"github.com/ddd/internal/context/log_handler/app/query"
-	"github.com/ddd/internal/context/log_handler/infra/service"
 	"github.com/ddd/pkg/integration"
 	"github.com/ddd/pkg/support"
 	"github.com/gin-gonic/gin"
+	"github.com/google/uuid"
 )
 
 type HttpServer struct {
@@ -23,18 +24,21 @@ func (h HttpServer) SelectLogFile(c *gin.Context) {
 	}
 
 	pathFile := support.GetFilePath("internal/context/log_handler/infra/storage/" + selectLogFileRequest.Name)
-	resultLogFile := service.SelectLogFileCommandDispatcher(c, &h.App, support.NewString(pathFile))
 
-	resultHumanLogFile := service.CreateHumanLogFileCommandDispatcher(c, &h.App, resultLogFile)
+	selectLogFileCommand := command.SelectLogFileCommand{ID: uuid.New(), Path: support.NewString(pathFile)}
+	resultLogFile, err := h.App.Commands.SelectLogFile.Handle(c, selectLogFileCommand)
+
+	if err != nil {
+		c.JSON(http.StatusUnprocessableEntity, gin.H{"error": err.Error()})
+		return
+	}
+
+	createHumanLogFileCommand := command.CreateHumanLogFileCommand{ID: uuid.New(), Content: resultLogFile}
+	resultHumanLogFile, _ := h.App.Commands.CreateHumanLogFile.Handle(c, createHumanLogFileCommand)
 
 	rawData := integration.PreSendCommand(resultHumanLogFile)
 
 	integration.Dispatch(c, rawData)
-
-	/*if err := h.App.Commands.SelectLogFile.Handle(c, command); err != nil {
-		c.JSON(http.StatusUnprocessableEntity, gin.H{"error": err.Error()})
-		return
-	}*/
 
 	c.JSON(http.StatusOK, gin.H{})
 }

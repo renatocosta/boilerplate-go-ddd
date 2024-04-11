@@ -17,10 +17,12 @@ func ShutdownApp(ctx context.Context, cleanup func(), errorApp string) {
 	case v := <-quit:
 		cleanup()
 		slog.Info("signal.Notify", v)
-	case done := <-ctx.Done():
+	case <-ctx.Done():
 		cleanup()
-		slog.Info("Err App", errorApp)
-		slog.Info("ctx.Done", done)
+		if errorApp != "" {
+			slog.Info("Err App: " + errorApp)
+		}
+		//slog.Info("ctx.Done: ", done)
 	}
 
 }

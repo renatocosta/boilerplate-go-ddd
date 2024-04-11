@@ -21,10 +21,3 @@ func NewApplication(ctx context.Context) app.Application {
 		},
 	}
 }
-
-func FindPlayersKilledCommandDispatcher(ctx context.Context, app *app.Application, rawData [][]string) string {
-	findPlayersKilledCommand := command.FindPlayersKilledCommand{Data: rawData}
-	resultPlayersKilled, _ := app.Commands.FindPlayersKilled.Handle(ctx, findPlayersKilledCommand)
-
-	return resultPlayersKilled
-}

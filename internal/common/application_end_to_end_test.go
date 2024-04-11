@@ -6,10 +6,13 @@ import (
 	"testing"
 
 	"github.com/DATA-DOG/go-sqlmock"
+	"github.com/ddd/internal/context/log_handler/app/command"
 	eventsH "github.com/ddd/internal/context/log_handler/domain/model/human_logfile/events"
 	"github.com/ddd/internal/context/log_handler/domain/model/logfile"
 	"github.com/ddd/internal/context/log_handler/domain/model/logfile/events"
 	"github.com/ddd/internal/context/log_handler/infra/service"
+	commandM "github.com/ddd/internal/context/match_reporting/app/command"
+	"github.com/google/uuid"
 	"go.uber.org/mock/gomock"
 
 	_ "github.com/go-sql-driver/mysql"
@@ -51,7 +54,6 @@ func runEndToEndCommands() {
 
 	repo.EXPECT().ReadFrom(gomock.Any()).Return(logFileEntity, nil).Times(1)
 	repo.EXPECT().Add(gomock.Any(), gomock.Any()).Return(nil).Times(1)
-	repo.EXPECT().GetAll(gomock.Any()).Return(nil, nil).Times(1)
 
 	ctx := context.Background()
 	db, mock, err := sqlmock.New()
@@ -62,11 +64,26 @@ func runEndToEndCommands() {
 	mock.ExpectBegin()
 	mock.ExpectCommit()
 
-	app := service.NewApplication(ctx, eventBus, repo, db)
+	app, _ := service.NewApplication(ctx, eventBus, repo, db)
 	appM := serviceM.NewApplication(ctx)
 
-	resultLogFile := service.SelectLogFileCommandDispatcher(ctx, &app, support.NewString(pathFile))
-	resultHumanLogFile := service.CreateHumanLogFileCommandDispatcher(ctx, &app, resultLogFile)
+	selectLogFileCommand := command.SelectLogFileCommand{ID: uuid.New(), Path: support.NewString(pathFile)}
+	resultLogFile, err := app.Commands.SelectLogFile.Handle(ctx, selectLogFileCommand)
+
+	if err != nil {
+		ag.T.Fatalf("an error '%s' was not expected when opening a stub database connection", err)
+	}
+
+	createHumanLogFileCommand := command.CreateHumanLogFileCommand{ID: uuid.New(), Content: resultLogFile}
+	resultHumanLogFile, err := app.Commands.CreateHumanLogFile.Handle(ctx, createHumanLogFileCommand)
+
 	rawData := integration.PreSendCommand(resultHumanLogFile)
-	serviceM.FindPlayersKilledCommandDispatcher(ctx, &appM, rawData)
+
+	findPlayersKilledCommand := commandM.FindPlayersKilledCommand{Data: rawData}
+	_, err = appM.Commands.FindPlayersKilled.Handle(ctx, findPlayersKilledCommand)
+
+	if err != nil {
+		ag.T.Fatalf("an error '%s' was not expected when opening a stub database connection", err)
+	}
+
 }
