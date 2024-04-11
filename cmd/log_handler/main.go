@@ -19,12 +19,10 @@ var eventBus = bus.NewEventBus()
 
 func main() {
 
-	errorApp := ""
+	var errorApp string
 
 	ctx, cancel := context.WithCancel(context.Background())
-	defer func() {
-		support.ShutdownApp(ctx, cancel, errorApp)
-	}()
+	defer support.ShutdownApp(ctx, cancel, &errorApp)
 
 	db, err := service.GetDb()
 	defer func() {
