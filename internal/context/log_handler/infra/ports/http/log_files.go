@@ -40,7 +40,7 @@ func (h HttpServer) SelectLogFile(c *gin.Context) {
 
 	integration.Dispatch(c, rawData)
 
-	c.JSON(http.StatusOK, gin.H{})
+	c.JSON(http.StatusCreated, gin.H{})
 }
 
 func (h HttpServer) AvailableLogFiles(c *gin.Context) {
@@ -50,6 +50,11 @@ func (h HttpServer) AvailableLogFiles(c *gin.Context) {
 
 	if err != nil {
 		c.JSON(http.StatusUnprocessableEntity, gin.H{"error": err.Error()})
+		return
+	}
+
+	if result == nil || len(*result) == 0 {
+		c.JSON(http.StatusNoContent, gin.H{"result": []string{}})
 		return
 	}
 

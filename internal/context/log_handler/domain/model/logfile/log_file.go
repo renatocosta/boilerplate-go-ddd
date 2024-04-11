@@ -24,7 +24,7 @@ type LogFile interface {
 type LogFileEntity struct {
 	domain.AggregateRoot
 	Path support.String
-	File *os.File
+	File *os.File `json:"-"`
 }
 
 func NewLogFile(id uuid.UUID, p support.String) LogFile {

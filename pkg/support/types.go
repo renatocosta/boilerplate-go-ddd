@@ -1,6 +1,9 @@
 package support
 
-import "database/sql"
+import (
+	"database/sql"
+	"encoding/json"
+)
 
 type String struct {
 	sql.NullString
@@ -17,4 +20,11 @@ func NewString(value string) String {
 
 func (s *String) Scan(value interface{}) error {
 	return s.NullString.Scan(value)
+}
+
+func (ns *String) MarshalJSON() ([]byte, error) {
+	if ns.Valid {
+		return json.Marshal(ns.String)
+	}
+	return json.Marshal(nil)
 }
