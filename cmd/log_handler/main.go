@@ -35,7 +35,7 @@ func main() {
 		return
 	}
 
-	app, _ := service.NewApplication(ctx, eventBus, adapters.NewLogFileRepository(db), db)
+	app, _, _ := service.NewApplication(ctx, eventBus, adapters.NewLogFileRepository(db), db)
 
 	router := gin.Default()
 	h := http.HttpServer{App: app}

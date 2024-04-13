@@ -4,15 +4,17 @@ import (
 	"context"
 
 	"github.com/ddd/internal/context/log_handler/domain/model/logfile"
+	"github.com/ddd/internal/shared/workflow"
 	"github.com/ddd/pkg/building_blocks/domain"
 )
 
 type AdditionalDependencies struct {
 	LogFileRepo logfile.LogFileRepository
+	WorkFlow    workflow.WorkFlowable
 }
 
-func NewAdditionalDependencies(logFileRepo logfile.LogFileRepository) AdditionalDependencies {
-	return AdditionalDependencies{LogFileRepo: logFileRepo}
+func NewAdditionalDependencies(logFileRepo logfile.LogFileRepository, workFlow workflow.WorkFlowable) AdditionalDependencies {
+	return AdditionalDependencies{LogFileRepo: logFileRepo, WorkFlow: workFlow}
 }
 
 type EventHandlerList struct {
