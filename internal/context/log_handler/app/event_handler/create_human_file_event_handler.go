@@ -3,11 +3,17 @@ package event_handler
 import (
 	"context"
 
-	"github.com/ddd/internal/context/log_handler/infra/event_handler"
+	"github.com/ddd/pkg/building_blocks/app"
 	"github.com/ddd/pkg/building_blocks/domain"
 )
 
-// UserRegisteredHandler handles the user registered event
-func CreateHumanFileEventHandler(ctx context.Context, event domain.Event, dependencies event_handler.AdditionalDependencies) error {
+type CreateHumanLogFileEventHandler struct {
+}
+
+func NewCreateHumanLogFileEventHandler() app.EventHandleable {
+	return &CreateHumanLogFileEventHandler{}
+}
+
+func (c CreateHumanLogFileEventHandler) Handle(ctx context.Context, event domain.Event) error {
 	return nil
 }

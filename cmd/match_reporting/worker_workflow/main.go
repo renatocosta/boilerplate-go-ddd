@@ -4,7 +4,7 @@ import (
 	"context"
 	"log"
 
-	"github.com/ddd/internal/context/match_reporting/infra/service"
+	"github.com/ddd/internal/shared"
 	"github.com/ddd/internal/shared/workflow"
 	"github.com/ddd/pkg/support"
 	"go.temporal.io/sdk/client"
@@ -18,12 +18,10 @@ func main() {
 	ctx, cancel := context.WithCancel(context.Background())
 	defer support.ShutdownApp(ctx, cancel, &errorApp)
 
-	_, workFlow := service.NewApplication(ctx)
-
-	initWorkerWorkFlow(workFlow)
+	initWorkerWorkFlow(workflow.NewWorkFlow(ctx))
 }
 
-func initWorkerWorkFlow(wf workflow.WorkFlowable) {
+func initWorkerWorkFlow(wf shared.WorkFlowable) {
 
 	c, err := client.Dial(client.Options{})
 	if err != nil {
@@ -31,7 +29,10 @@ func initWorkerWorkFlow(wf workflow.WorkFlowable) {
 	}
 	defer c.Close()
 
-	w := worker.New(c, workflow.PlayersKilledTaskQueueName, worker.Options{})
+	w := worker.New(c, workflow.PlayersKilledTaskQueueName, worker.Options{
+		Identity: "Match Reporting",
+		// Other options if needed
+	})
 
 	// This worker hosts both Workflow and Activity functions.
 	w.RegisterWorkflow(wf.PlayersKilledWorkflow)

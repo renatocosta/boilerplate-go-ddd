@@ -6,8 +6,7 @@ import (
 
 	_ "github.com/go-sql-driver/mysql"
 
-	"github.com/ddd/internal/context/log_handler/infra/adapters"
-	"github.com/ddd/internal/context/log_handler/infra/service"
+	"github.com/ddd/internal/shared"
 	"github.com/ddd/internal/shared/workflow"
 	"github.com/ddd/pkg/building_blocks/infra/bus"
 	"github.com/ddd/pkg/support"
@@ -24,23 +23,10 @@ func main() {
 	ctx, cancel := context.WithCancel(context.Background())
 	defer support.ShutdownApp(ctx, cancel, &errorApp)
 
-	db, err := service.GetDb()
-	defer func() {
-		db.Close()
-	}()
-
-	if err != nil {
-		errorApp = err.Error()
-		cancel()
-		return
-	}
-
-	_, workFlow, _ := service.NewApplication(ctx, eventBus, adapters.NewLogFileRepository(db), db)
-
-	initWorkerWorkFlow(workFlow)
+	initWorkerWorkFlow(workflow.NewWorkFlow(ctx))
 }
 
-func initWorkerWorkFlow(wf workflow.WorkFlowable) {
+func initWorkerWorkFlow(wf shared.WorkFlowable) {
 
 	c, err := client.Dial(client.Options{})
 	if err != nil {
@@ -48,7 +34,9 @@ func initWorkerWorkFlow(wf workflow.WorkFlowable) {
 	}
 	defer c.Close()
 
-	w := worker.New(c, workflow.PlayersKilledTaskQueueName, worker.Options{})
+	w := worker.New(c, workflow.PlayersKilledTaskQueueName, worker.Options{
+		Identity: "Log Handler",
+	})
 
 	// This worker hosts both Workflow and Activity functions.
 	w.RegisterWorkflow(wf.PlayersKilledWorkflow)

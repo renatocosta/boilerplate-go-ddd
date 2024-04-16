@@ -55,7 +55,6 @@ func (h selectLogFileHandler) Handle(ctx context.Context, cmd SelectLogFileComma
 	}
 
 	logFile_ := logFile.Select(lines)
-
 	for _, event := range logFile_.Events {
 		h.eventBus.Publish(event)
 	}

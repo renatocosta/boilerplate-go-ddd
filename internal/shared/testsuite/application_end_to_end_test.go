@@ -1,4 +1,4 @@
-package shared
+package testsuite
 
 import (
 	"context"
@@ -12,6 +12,7 @@ import (
 	"github.com/ddd/internal/context/log_handler/domain/model/logfile/events"
 	"github.com/ddd/internal/context/log_handler/infra/service"
 	commandM "github.com/ddd/internal/context/match_reporting/app/command"
+	"github.com/ddd/internal/shared/workflow"
 	"github.com/google/uuid"
 	"go.uber.org/mock/gomock"
 
@@ -64,8 +65,10 @@ func runEndToEndCommands() {
 	mock.ExpectBegin()
 	mock.ExpectCommit()
 
-	app, _ := service.NewApplication(ctx, eventBus, repo, db)
-	appM := serviceM.NewApplication(ctx)
+	workFlow := workflow.NewMockWorkFlowable(controll)
+	workFlow.EXPECT().StartFrom(gomock.Any()).Times(1)
+
+	app, _ := service.NewApplication(ctx, eventBus, repo, db, workFlow)
 
 	selectLogFileCommand := command.SelectLogFileCommand{ID: uuid.New(), Path: support.NewString(pathFile)}
 	resultLogFile, err := app.Commands.SelectLogFile.Handle(ctx, selectLogFileCommand)
@@ -73,6 +76,8 @@ func runEndToEndCommands() {
 	if err != nil {
 		ag.T.Fatalf("an error '%s' was not expected when opening a stub database connection", err)
 	}
+
+	appM := serviceM.NewApplication(ctx)
 
 	createHumanLogFileCommand := command.CreateHumanLogFileCommand{ID: uuid.New(), Content: resultLogFile}
 	resultHumanLogFile, err := app.Commands.CreateHumanLogFile.Handle(ctx, createHumanLogFileCommand)

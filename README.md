@@ -1,6 +1,6 @@
-# go-Quake Data Collector ⚡️
+# Modular Monolith ⚡️
 
-Example of Clean Architecture + DDD in go
+Example of Clean Architecture and Domain Driven Design + Workflow Engine(Temporal.io) in Golang
 
 ## Unit testing
 ```

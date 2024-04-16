@@ -26,14 +26,15 @@ func NewCreateHumanLogFileHandler(eventBus *bus.EventBus) CreateHumanLogFileHand
 }
 
 func (h createHumanLogFileHandler) Handle(ctx context.Context, cmd CreateHumanLogFileCommand) ([]human_logfile.HumanLogFileRowable, error) {
-
 	humanLogFile := human_logfile.NewHumanLogFile(cmd.ID)
 
 	for _, row := range cmd.Content {
+
 		rowMapper := services.NewHumanRowMapper()
 		rowMap := rowMapper.Map(row)
 
 		if len(rowMap) > 0 {
+
 			humanLogFile.AddRow(
 				human_logfile.NewHumanLogFileRow(
 					rowMap["who_killed"],

@@ -7,11 +7,10 @@ import (
 	"github.com/ddd/internal/context/match_reporting/app/command"
 	players_killed "github.com/ddd/internal/context/match_reporting/domain/model/player_killed"
 	"github.com/ddd/internal/context/match_reporting/domain/model/player_killed/state"
-	"github.com/ddd/internal/shared/workflow"
 	_ "github.com/go-sql-driver/mysql"
 )
 
-func NewApplication(ctx context.Context) (app.Application, workflow.WorkFlowable) {
+func NewApplication(ctx context.Context) app.Application {
 
 	playerStates := players_killed.NewPlayer(state.NewKillPlayer(), state.NewDeathPlayer())
 	playerKilled := players_killed.NewPlayerKilled(playerStates)
@@ -22,7 +21,5 @@ func NewApplication(ctx context.Context) (app.Application, workflow.WorkFlowable
 		},
 	}
 
-	workflow := workflow.NewWorkFlowFromMatchReporting(app)
-
-	return app, workflow
+	return app
 }
