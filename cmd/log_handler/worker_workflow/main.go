@@ -3,13 +3,14 @@ package main
 import (
 	"context"
 	"log"
+	"os/signal"
+	"syscall"
 
 	_ "github.com/go-sql-driver/mysql"
 
 	"github.com/ddd/internal/shared"
 	"github.com/ddd/internal/shared/workflow"
 	"github.com/ddd/pkg/building_blocks/infra/bus"
-	"github.com/ddd/pkg/support"
 	"go.temporal.io/sdk/client"
 	"go.temporal.io/sdk/worker"
 )
@@ -18,10 +19,8 @@ var eventBus = bus.NewEventBus()
 
 func main() {
 
-	var errorApp string
-
-	ctx, cancel := context.WithCancel(context.Background())
-	defer support.ShutdownApp(ctx, cancel, &errorApp)
+	ctx, stop := signal.NotifyContext(context.Background(), syscall.SIGINT, syscall.SIGTERM)
+	defer stop()
 
 	initWorkerWorkFlow(workflow.NewWorkFlow(ctx))
 }

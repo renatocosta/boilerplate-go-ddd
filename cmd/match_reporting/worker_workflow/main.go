@@ -3,20 +3,19 @@ package main
 import (
 	"context"
 	"log"
+	"os/signal"
+	"syscall"
 
 	"github.com/ddd/internal/shared"
 	"github.com/ddd/internal/shared/workflow"
-	"github.com/ddd/pkg/support"
 	"go.temporal.io/sdk/client"
 	"go.temporal.io/sdk/worker"
 )
 
 func main() {
 
-	var errorApp string
-
-	ctx, cancel := context.WithCancel(context.Background())
-	defer support.ShutdownApp(ctx, cancel, &errorApp)
+	ctx, stop := signal.NotifyContext(context.Background(), syscall.SIGINT, syscall.SIGTERM)
+	defer stop()
 
 	initWorkerWorkFlow(workflow.NewWorkFlow(ctx))
 }

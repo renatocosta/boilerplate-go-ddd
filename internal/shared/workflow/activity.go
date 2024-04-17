@@ -4,8 +4,8 @@ import (
 	"context"
 	"log"
 
+	"github.com/ddd/cmd/log_handler/config"
 	"github.com/ddd/internal/context/log_handler/app/command"
-	"github.com/ddd/internal/context/log_handler/infra/adapters"
 	"github.com/ddd/internal/context/log_handler/infra/service"
 	commandM "github.com/ddd/internal/context/match_reporting/app/command"
 	serviceM "github.com/ddd/internal/context/match_reporting/infra/service"
@@ -17,9 +17,13 @@ func (w WorkFlow) HumanFile(ctx context.Context, command command.CreateHumanLogF
 		command.ID,
 	)
 
-	conf, _ := service.NewConfig(ctx)
+	cfg, err := config.Start(ctx, NewWorkFlow(ctx))
+	if err != nil {
+		return nil, err
+	}
+	defer cfg.Close()
 
-	app, _ := service.NewApplication(ctx, conf.GetEventBus(), adapters.NewLogFileRepository(conf.GetDB()), conf.GetDB(), conf.GetWorkFlow())
+	app, _ := service.NewApplication(ctx, cfg)
 
 	resultHumanLogFile, err := app.Commands.CreateHumanLogFile.Handle(ctx, command)
 
@@ -41,5 +45,6 @@ func (w WorkFlow) PlayersKilled(ctx context.Context, data [][]string) (string, e
 
 func (w WorkFlow) Undo(ctx context.Context, command command.CreateHumanLogFileCommand) (string, error) {
 	log.Print("Undoing players killed")
+	//Implement here the use case for undo
 	return "", nil
 }

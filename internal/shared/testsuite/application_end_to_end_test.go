@@ -6,6 +6,7 @@ import (
 	"testing"
 
 	"github.com/DATA-DOG/go-sqlmock"
+	"github.com/ddd/cmd/log_handler/config"
 	"github.com/ddd/internal/context/log_handler/app/command"
 	eventsH "github.com/ddd/internal/context/log_handler/domain/model/human_logfile/events"
 	"github.com/ddd/internal/context/log_handler/domain/model/logfile"
@@ -68,7 +69,13 @@ func runEndToEndCommands() {
 	workFlow := workflow.NewMockWorkFlowable(controll)
 	workFlow.EXPECT().StartFrom(gomock.Any()).Times(1)
 
-	app, _ := service.NewApplication(ctx, eventBus, repo, db, workFlow)
+	cfg := &config.Config{
+		Database: db,
+		EventBus: eventBus,
+		WorkFlow: workFlow,
+		Repo:     repo}
+
+	app, _ := service.NewApplication(ctx, cfg)
 
 	selectLogFileCommand := command.SelectLogFileCommand{ID: uuid.New(), Path: support.NewString(pathFile)}
 	resultLogFile, err := app.Commands.SelectLogFile.Handle(ctx, selectLogFileCommand)
