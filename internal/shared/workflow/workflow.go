@@ -6,6 +6,7 @@ import (
 	"log"
 	"time"
 
+	"github.com/ddd/cmd/log_handler/config"
 	"github.com/ddd/internal/context/log_handler/app/command"
 	"github.com/ddd/internal/context/log_handler/domain/model/logfile/events"
 	"github.com/ddd/internal/shared"
@@ -26,10 +27,12 @@ func NewWorkFlow(ctx context.Context) shared.WorkFlowable {
 
 func (w WorkFlow) StartFrom(event events.LogFileSelected) {
 
-	c, err := client.Dial(client.Options{})
+	cfg := config.GetConfig()
+
+	c, err := client.Dial(client.Options{HostPort: cfg.Variable.TemporalHostPort})
 
 	if err != nil {
-		log.Fatalln("Unable to create Temporal client:", err)
+		panic("Unable to create Temporal client:")
 	}
 
 	defer c.Close()

@@ -7,11 +7,12 @@ import (
 )
 
 type Environment struct {
-	dbName string
-	dbHost string
-	dbUser string
-	dbPass string
-	dbPort string
+	dbName           string
+	dbHost           string
+	dbUser           string
+	dbPass           string
+	dbPort           string
+	TemporalHostPort string
 }
 
 func Load() (Environment, error) {
@@ -23,10 +24,11 @@ func Load() (Environment, error) {
 	}
 
 	return Environment{
-		dbName: os.Getenv("DB_NAME"),
-		dbHost: os.Getenv("DB_HOST"),
-		dbUser: os.Getenv("DB_USER"),
-		dbPass: os.Getenv("DB_PASS"),
-		dbPort: os.Getenv("DB_PORT"),
+		dbName:           os.Getenv("DB_NAME"),
+		dbHost:           os.Getenv("DB_HOST"),
+		dbUser:           os.Getenv("DB_USER"),
+		dbPass:           os.Getenv("DB_PASS"),
+		dbPort:           os.Getenv("DB_PORT"),
+		TemporalHostPort: os.Getenv("TEMPORAL_HOST_PORT"),
 	}, nil
 }

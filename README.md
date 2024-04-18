@@ -4,12 +4,17 @@ Example of Clean Architecture and Domain Driven Design + Workflow Engine(Tempora
 
 ## Unit testing
 ```
-make local.test
+make test
 ```
 
 ## Let's Run the Application 
 ```
-make local.run
+docker-compose up
+or
+make migrate-up
+make run
+make run.log_handler_worker_workflow
+make run.match_reporting_worker_workflow
 ```
 
 ## Event Modelling

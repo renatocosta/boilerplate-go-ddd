@@ -9,11 +9,18 @@ COPY . .
 
 RUN curl -sSfL https://raw.githubusercontent.com/cosmtrek/air/master/install.sh | sh -s -- -b $(go env GOPATH)/bin
 
+RUN curl -L https://github.com/golang-migrate/migrate/releases/download/v4.16.0/migrate.linux-amd64.tar.gz | tar xvz && mv ./migrate /usr/local/bin
+
+RUN go install github.com/golang/mock/mockgen
+
 # Download Go dependencies
 RUN go mod download
 
-# Expose port 8080 to the outside world
-EXPOSE 8080
+# Copy the entrypoint script into the container
+COPY docker-entrypoint.sh /entrypoint.sh
 
-# Run the application
-CMD ["air"]
+# Set the entrypoint
+ENTRYPOINT ["/entrypoint.sh"]
+
+# Expose port 8181 to the outside world
+EXPOSE 8181

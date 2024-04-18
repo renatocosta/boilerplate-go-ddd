@@ -6,6 +6,7 @@ import (
 	"os/signal"
 	"syscall"
 
+	"github.com/ddd/cmd/log_handler/config"
 	"github.com/ddd/internal/shared"
 	"github.com/ddd/internal/shared/workflow"
 	"go.temporal.io/sdk/client"
@@ -21,8 +22,9 @@ func main() {
 }
 
 func initWorkerWorkFlow(wf shared.WorkFlowable) {
+	cfg := config.GetConfig()
 
-	c, err := client.Dial(client.Options{})
+	c, err := client.Dial(client.Options{HostPort: cfg.Variable.TemporalHostPort})
 	if err != nil {
 		log.Fatalln("Unable to create Temporal client.", err)
 	}

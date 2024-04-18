@@ -3,6 +3,7 @@ package config
 import (
 	"context"
 	"database/sql"
+	"log"
 
 	"github.com/ddd/internal/context/log_handler/domain/model/logfile"
 	"github.com/ddd/internal/context/log_handler/infra/adapters"
@@ -19,13 +20,10 @@ type Config struct {
 }
 
 func Start(ctx context.Context, workFlow shared.WorkFlowable) (*Config, error) {
-	env, err := Load()
-	if err != nil {
-		return &Config{}, err
-	}
 
-	cfg := &Config{Variable: env}
-	err = cfg.DatabaseOpen()
+	cfg := GetConfig()
+
+	err := cfg.DatabaseOpen()
 	if err != nil {
 		return cfg, err
 	}
@@ -37,6 +35,15 @@ func Start(ctx context.Context, workFlow shared.WorkFlowable) (*Config, error) {
 	//cfg.Log = lognative.NewLogNative()
 
 	return cfg, nil
+}
+
+func GetConfig() *Config {
+	env, err := Load()
+	if err != nil {
+		log.Fatalln("Unable to load envs.", err)
+	}
+
+	return &Config{Variable: env}
 }
 
 func (r Config) Close() {

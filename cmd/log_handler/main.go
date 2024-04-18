@@ -2,9 +2,8 @@ package main
 
 import (
 	"context"
+	"log"
 	_ "net/http/pprof"
-	"os/signal"
-	"syscall"
 
 	"github.com/gin-gonic/gin"
 	_ "github.com/go-sql-driver/mysql"
@@ -16,12 +15,11 @@ import (
 )
 
 func main() {
-	ctx, stop := signal.NotifyContext(context.Background(), syscall.SIGINT, syscall.SIGTERM)
-	defer stop()
 
+	ctx := context.Background()
 	cfg, err := config.Start(ctx, workflow.NewWorkFlow(ctx))
 	if err != nil {
-		panic(err)
+		log.Fatalln(err)
 	}
 	defer cfg.Close()
 
@@ -30,7 +28,7 @@ func main() {
 	router := gin.Default()
 	h := http.HttpServer{App: app}
 	http.InitRoutes(&router.RouterGroup, h)
-	if err := router.Run(":8888"); err != nil {
-		//cancel()
+
+	if err := router.Run(":8181"); err != nil {
 	}
 }

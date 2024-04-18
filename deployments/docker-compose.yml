@@ -1,17 +1,17 @@
 version: '3.8'
 services:
   app:
-    build: .
+    build: ../.
     ports:
-      - "8080:8080"
+      - "8181:8181"
     volumes:
-      - .:/app
+      - ../:/app
     environment:
       - AIR_ENV=development
     depends_on:
       - mysql
     networks:
-      - mynet      
+      - temporal-network      
   mysql:
     image: mysql:5.7
     restart: always
@@ -21,8 +21,10 @@ services:
       MYSQL_USER: renato
       MYSQL_PASSWORD: secret
     networks:
-      - mynet      
+      - temporal-network      
     ports:
       - "3306:3306"
 networks:
-  mynet:
+  temporal-network:
+    driver: bridge
+    name: temporal-network
