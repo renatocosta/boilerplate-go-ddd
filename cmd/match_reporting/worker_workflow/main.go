@@ -2,13 +2,13 @@ package main
 
 import (
 	"context"
-	"log"
+	"os"
 	"os/signal"
 	"syscall"
 
-	"github.com/ddd/cmd/log_handler/config"
 	"github.com/ddd/internal/shared"
 	"github.com/ddd/internal/shared/workflow"
+	"github.com/ddd/pkg/support"
 	"go.temporal.io/sdk/client"
 	"go.temporal.io/sdk/worker"
 )
@@ -22,12 +22,9 @@ func main() {
 }
 
 func initWorkerWorkFlow(wf shared.WorkFlowable) {
-	cfg := config.GetConfig()
 
-	c, err := client.Dial(client.Options{HostPort: cfg.Variable.TemporalHostPort})
-	if err != nil {
-		log.Fatalln("Unable to create Temporal client.", err)
-	}
+	c, err := client.Dial(client.Options{HostPort: os.Getenv("TEMPORAL_HOST_PORT")})
+	support.PanicOnError(err, "Unable to create Temporal client.")
 	defer c.Close()
 
 	w := worker.New(c, workflow.PlayersKilledTaskQueueName, worker.Options{
@@ -41,7 +38,5 @@ func initWorkerWorkFlow(wf shared.WorkFlowable) {
 
 	// Start listening to the Task Queue.
 	err = w.Run(worker.InterruptCh())
-	if err != nil {
-		log.Fatalln("unable to start Worker", err)
-	}
+	support.PanicOnError(err, "Unable to start Worker.")
 }

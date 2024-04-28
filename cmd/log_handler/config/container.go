@@ -3,16 +3,15 @@ package config
 import (
 	"context"
 	"database/sql"
-	"log"
 
 	"github.com/ddd/internal/context/log_handler/domain/model/logfile"
 	"github.com/ddd/internal/context/log_handler/infra/adapters"
 	"github.com/ddd/internal/shared"
 	"github.com/ddd/pkg/building_blocks/infra/bus"
+	"github.com/ddd/pkg/support"
 )
 
 type Config struct {
-	Variable Environment
 	Database *sql.DB
 	EventBus *bus.EventBus
 	WorkFlow shared.WorkFlowable
@@ -38,12 +37,10 @@ func Start(ctx context.Context, workFlow shared.WorkFlowable) (*Config, error) {
 }
 
 func GetConfig() *Config {
-	env, err := Load()
-	if err != nil {
-		log.Fatalln("Unable to load envs.", err)
-	}
+	err := Load()
+	support.PanicOnError(err, "Unable to load envs.")
 
-	return &Config{Variable: env}
+	return &Config{}
 }
 
 func (r Config) Close() {

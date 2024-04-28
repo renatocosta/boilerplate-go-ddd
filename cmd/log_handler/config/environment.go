@@ -6,29 +6,13 @@ import (
 	"github.com/joho/godotenv"
 )
 
-type Environment struct {
-	dbName           string
-	dbHost           string
-	dbUser           string
-	dbPass           string
-	dbPort           string
-	TemporalHostPort string
-}
-
-func Load() (Environment, error) {
+func Load() error {
 	if os.Getenv("APP_ENV") == "" || os.Getenv("APP_ENV") == "local" {
 		err := godotenv.Load()
 		if err != nil {
-			return Environment{}, err
+			return err
 		}
 	}
 
-	return Environment{
-		dbName:           os.Getenv("DB_NAME"),
-		dbHost:           os.Getenv("DB_HOST"),
-		dbUser:           os.Getenv("DB_USER"),
-		dbPass:           os.Getenv("DB_PASS"),
-		dbPort:           os.Getenv("DB_PORT"),
-		TemporalHostPort: os.Getenv("TEMPORAL_HOST_PORT"),
-	}, nil
+	return nil
 }

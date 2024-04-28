@@ -1,12 +1,15 @@
 package http
 
 import (
-	"github.com/gin-gonic/gin"
+	"net/http"
+
+	"github.com/gorilla/mux"
 )
 
 func InitRoutes(
-	r *gin.RouterGroup,
+	r *mux.Router,
 	controller HttpServer) {
-	r.POST("/select-log-file", controller.SelectLogFile)
-	r.GET("/available-log-files", controller.AvailableLogFiles)
+	r.Handle("/select-log-file", ValidateRequest(http.HandlerFunc(controller.SelectLogFile))).Methods("POST")
+	r.HandleFunc("/available-log-files", controller.AvailableLogFiles).Methods("GET")
+
 }

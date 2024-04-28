@@ -3,7 +3,6 @@ package command
 import (
 	"context"
 	"encoding/json"
-	"fmt"
 
 	players_killed "github.com/ddd/internal/context/match_reporting/domain/model/player_killed"
 	"github.com/ddd/pkg/building_blocks/app"
@@ -38,8 +37,7 @@ func (h findPlayersKilledHandler) Handle(ctx context.Context, cmd FindPlayersKil
 	}
 	jsonData, err := json.MarshalIndent(map[string]players_killed.GameInfo{"game_1": gameInfo}, "", "")
 	if err != nil {
-		fmt.Println("Error marshaling JSON:", err)
-		return "", nil
+		return err.Error(), nil
 	}
 
 	return string(jsonData), nil

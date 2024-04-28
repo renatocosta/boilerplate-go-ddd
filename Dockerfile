@@ -11,7 +11,9 @@ RUN curl -sSfL https://raw.githubusercontent.com/cosmtrek/air/master/install.sh 
 
 RUN curl -L https://github.com/golang-migrate/migrate/releases/download/v4.16.0/migrate.linux-amd64.tar.gz | tar xvz && mv ./migrate /usr/local/bin
 
-RUN go install github.com/golang/mock/mockgen
+RUN go get github.com/golang/mock/mockgen@v1.6.0
+
+RUN git config --global --add safe.directory /app
 
 # Download Go dependencies
 RUN go mod download

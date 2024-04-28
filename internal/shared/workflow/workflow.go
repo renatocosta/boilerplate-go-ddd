@@ -4,12 +4,13 @@ import (
 	"context"
 	"fmt"
 	"log"
+	"os"
 	"time"
 
-	"github.com/ddd/cmd/log_handler/config"
 	"github.com/ddd/internal/context/log_handler/app/command"
 	"github.com/ddd/internal/context/log_handler/domain/model/logfile/events"
 	"github.com/ddd/internal/shared"
+	"github.com/ddd/pkg/support"
 	"go.temporal.io/sdk/client"
 	"go.temporal.io/sdk/temporal"
 	"go.temporal.io/sdk/workflow"
@@ -27,13 +28,8 @@ func NewWorkFlow(ctx context.Context) shared.WorkFlowable {
 
 func (w WorkFlow) StartFrom(event events.LogFileSelected) {
 
-	cfg := config.GetConfig()
-
-	c, err := client.Dial(client.Options{HostPort: cfg.Variable.TemporalHostPort})
-
-	if err != nil {
-		panic("Unable to create Temporal client:")
-	}
+	c, err := client.Dial(client.Options{HostPort: os.Getenv("TEMPORAL_HOST_PORT")})
+	support.PanicOnError(err, "Unable to create Temporal client.")
 
 	defer c.Close()
 
@@ -46,19 +42,14 @@ func (w WorkFlow) StartFrom(event events.LogFileSelected) {
 
 	we, err := c.ExecuteWorkflow(w.ctx, options, w.PlayersKilledWorkflow, command.CreateHumanLogFileCommand{ID: event.ID, Content: event.Content})
 
-	if err != nil {
-		log.Fatalln("Unable to start the Workflow:", err)
-	}
+	support.PanicOnError(err, "Unable to start the Workflow:")
 
 	log.Printf("WorkflowID: %s RunID: %s\n", we.GetID(), we.GetRunID())
 
 	var result string
 
 	err = we.Get(w.ctx, &result)
-
-	if err != nil {
-		log.Fatalln("Unable to get Workflow result:", err)
-	}
+	support.PanicOnError(err, "Unable to get Workflow result:")
 
 	log.Println(result)
 
@@ -118,7 +109,7 @@ func (w WorkFlow) PlayersKilledWorkflow(ctx workflow.Context, input command.Crea
 				input.Content, playerKilledErr)
 	}
 
-	result := fmt.Sprintf("Workflow completed (transaction IDs: %s, %s)", humanFileOutput, playersKilledOutput)
+	result := fmt.Sprintf("Workflow completed (%s)", playersKilledOutput)
 
 	return result, nil
 

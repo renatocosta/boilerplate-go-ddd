@@ -45,6 +45,6 @@ func (w WorkFlow) PlayersKilled(ctx context.Context, data [][]string) (string, e
 
 func (w WorkFlow) Undo(ctx context.Context, command command.CreateHumanLogFileCommand) (string, error) {
 	log.Print("Undoing players killed")
-	//Implement here the use case for undo
+	//Implement here the use case for saga compensation
 	return "", nil
 }

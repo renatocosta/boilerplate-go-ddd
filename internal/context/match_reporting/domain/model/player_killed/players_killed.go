@@ -1,5 +1,7 @@
 package players_killed
 
+import "github.com/ddd/pkg/support"
+
 var (
 	WorldKillerLabel = "world"
 )
@@ -33,9 +35,8 @@ func (p *PlayerKilledEntity) GetTotal() int64 {
 }
 
 func (p *PlayerKilledEntity) Compute(match Matchable) {
-	if err := match.Validation(); err != nil {
-		panic(err.Error())
-	}
+	err := match.Validation()
+	support.PanicOnError(err, "")
 
 	if !p.IsEligibleToBeAPlayer(match) {
 		p.Player.KillDown(match)
