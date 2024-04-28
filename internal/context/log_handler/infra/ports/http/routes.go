@@ -11,5 +11,4 @@ func InitRoutes(
 	controller HttpServer) {
 	r.Handle("/select-log-file", ValidateRequest(http.HandlerFunc(controller.SelectLogFile))).Methods("POST")
 	r.HandleFunc("/available-log-files", controller.AvailableLogFiles).Methods("GET")
-
 }
