@@ -1,4 +1,4 @@
-# Modular Monolith ⚡️
+# Strategic Monolith ⚡️
 
 Example of Clean Architecture and Domain Driven Design + Workflow Engine(Temporal.io) in Golang
 
