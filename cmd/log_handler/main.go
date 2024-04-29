@@ -4,24 +4,22 @@ import (
 	"context"
 	"log"
 	"net/http"
-	_ "net/http/pprof"
-	"os"
-
-	_ "github.com/go-sql-driver/mysql"
-	"github.com/gorilla/handlers"
-	"github.com/gorilla/mux"
+	"time"
 
 	"github.com/ddd/cmd/log_handler/config"
 	httpPort "github.com/ddd/internal/context/log_handler/infra/ports/http"
 	"github.com/ddd/internal/context/log_handler/infra/service"
 	"github.com/ddd/internal/shared/workflow"
 	"github.com/ddd/pkg/support"
+	"github.com/gorilla/mux"
 )
 
 func main() {
+	// Create a context with a timeout of 5 seconds
+	ctx, cancel := context.WithTimeout(context.Background(), 7*time.Second)
+	ctxWorkflow := context.Background()
 
-	ctx := context.Background()
-	cfg, err := config.Start(ctx, workflow.NewWorkFlow(ctx))
+	cfg, err := config.Start(ctx, workflow.NewWorkFlow(ctxWorkflow))
 	support.PanicOnError(err, "")
 
 	defer cfg.Close()
@@ -30,11 +28,20 @@ func main() {
 	h := httpPort.HttpServer{App: app}
 
 	r := mux.NewRouter()
-	r.Use(mux.CORSMethodMiddleware(r))
-
 	httpPort.InitRoutes(r, h)
-	loggedRouter := handlers.LoggingHandler(os.Stdout, r)
 
-	log.Fatal(http.ListenAndServe(":"+os.Getenv("API_PORT"), loggedRouter))
+	srv := &http.Server{
+		Addr:    ":8181",
+		Handler: r,
+	}
+
+	go func() {
+		log.Println("Starting server...")
+		if err := srv.ListenAndServe(); err != nil && err != http.ErrServerClosed {
+			log.Fatalf("Error starting server: %s\n", err)
+		}
+	}()
+
+	support.ShutdownHandler(ctx, cancel, srv)
 
 }
